@@ -1,18 +1,23 @@
 package com.example.tiafragmentexample2;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SimpleFragment.OnFragmentInteractionListener {
 
     private Button mButton;
     private boolean isFragmentDisplayed = false;
     static final String STATE_FRAGMENT = "state_of_fragment";
+
+    private int mRadioButtonChoice = 2; // The default (no choice).
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,9 +28,9 @@ public class MainActivity extends AppCompatActivity {
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!isFragmentDisplayed){
-                    displayFragment();
-                } else closeFragment();
+                if(isFragmentDisplayed){
+                    closeFragment();
+                } else displayFragment();
             }
         });
 
@@ -42,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void displayFragment(){
 
-        SimpleFragment simpleFragment = SimpleFragment.newInstance();
+        SimpleFragment simpleFragment = SimpleFragment.newInstance(mRadioButtonChoice);
 
         // Get the FragmentManager and start a transaction.
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -78,9 +83,26 @@ public class MainActivity extends AppCompatActivity {
         isFragmentDisplayed = false;
     }
 
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        // Save the state of the fragment (true=open, false=closed).
+    //Esse código que eu comentei é o que está no TIA! O que inicia na linha noventa é o que eu fiz.
+//    public void onSaveInstanceState(Bundle savedInstanceState) {
+//        // Save the state of the fragment (true=open, false=closed).
+//        savedInstanceState.putBoolean(STATE_FRAGMENT, isFragmentDisplayed);
+//        super.onSaveInstanceState(savedInstanceState);
+//    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
         savedInstanceState.putBoolean(STATE_FRAGMENT, isFragmentDisplayed);
         super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onRadioButtonChoice(int choice) {
+
+        // Keep the radio button choice to pass it back to the fragment.
+        mRadioButtonChoice = choice;
+        Toast.makeText(this, "Choice is " + Integer.toString(choice),
+                Toast.LENGTH_LONG).show();
+
     }
 }
